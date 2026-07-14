@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
         req.user = token
         next();
     } catch(err){
-        res.status(500).json({success: false, message: "Interval Server Error"})
+        res.status(500).json({success: false, message: "Token Expired."})
     }
 }
 
