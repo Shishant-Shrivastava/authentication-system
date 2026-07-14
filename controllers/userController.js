@@ -2,10 +2,20 @@ const User = require("../models/User.js");
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const getAllUsers = async (req, res)=>{
+const getUsers = async (req, res)=>{
     try {
+        const role = req.user.role;
         const fetchedUsers = await User.find()
-        res.json(fetchedUsers)
+        if(!fetchedUsers){
+            res.status(403).json({success: false, message: "User not found."})
+        }
+        if(role=='admin'){
+            res.status(200).json(fetchedUsers)
+        } else {
+            const result = fetchedUsers.map(x => ({name: x.name}))
+            
+            res.status(200).json(result)
+        }
     } catch(err){
         console.error("Error Retrieving all users: ", err);   
         res.status(403).json({success: false, message: "User not found."})
@@ -69,25 +79,19 @@ const loginUser = async (req, res) => {
     }
 }
 
-// const homePage = async(req, res) => {
-//     try{
-//         const role = req.user.role;
-
-//         if(role=='admin') {
-//             getAllUsers
-//         }
-
-//         res.status(200).json({success: true})
-        
-//     } catch (err) {
-//         res.status(401).json({success: false, message: 'Bhadwa h tu'}); 
-//     }
-// }
+const homePage = (req, res) => {
+    try{
+        getUsers(req, res)
+    } catch (err) {
+        res.status(401).json({success: false, message: 'Bhadwa h tu'}); 
+    }
+}
 
 module.exports = {
-    getAllUsers,
+    getUsers,
     getUserById,
     registerUser,
-    loginUser
+    loginUser,
+    homePage
 }
 
